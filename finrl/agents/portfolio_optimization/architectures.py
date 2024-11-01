@@ -3,6 +3,8 @@ from __future__ import annotations
 import numpy as np
 import torch
 from torch import nn
+
+# NOTE: torch_geometric is for GNNs
 from torch_geometric.data import Batch
 from torch_geometric.data import Data
 from torch_geometric.nn import RGCNConv
