@@ -3,7 +3,6 @@ from __future__ import division
 from __future__ import print_function
 
 from DotmapUtils import get_required_argument
-from config.utils import swish, get_affine_params
 
 import gym
 import numpy as np
@@ -15,40 +14,49 @@ TORCH_DEVICE = torch.device('cuda') if torch.cuda.is_available() else torch.devi
 
 
 class PtModel(nn.Module):
-
-    def __init__(self, ensemble_size, in_features, out_features):
+    def __init__(self, ensemble_size, in_features, out_features, hidden_features=500):
         super().__init__()
-
         self.num_nets = ensemble_size
-
         self.in_features = in_features
         self.out_features = out_features
 
-        self.lin0_w, self.lin0_b = get_affine_params(ensemble_size, in_features, 500)
+        self.model = nn.Sequential(
+            nn.Linear(in_features, hidden_features),
+            nn.SiLU(),
+            nn.Linear(hidden_features, hidden_features),
+            nn.SiLU(),
+            nn.Linear(hidden_features, hidden_features),
+            nn.SiLU(),
+            nn.Linear(hidden_features, out_features),
+        )
 
-        self.lin1_w, self.lin1_b = get_affine_params(ensemble_size, 500, 500)
-
-        self.lin2_w, self.lin2_b = get_affine_params(ensemble_size, 500, 500)
-
-        self.lin3_w, self.lin3_b = get_affine_params(ensemble_size, 500, out_features)
-
+        # Input normalization parameters
         self.inputs_mu = nn.Parameter(torch.zeros(in_features), requires_grad=False)
-        self.inputs_sigma = nn.Parameter(torch.zeros(in_features), requires_grad=False)
+        self.inputs_sigma = nn.Parameter(torch.ones(in_features), requires_grad=False)
 
-        self.max_logvar = nn.Parameter(torch.ones(1, out_features // 2, dtype=torch.float32) / 2.0)
-        self.min_logvar = nn.Parameter(- torch.ones(1, out_features // 2, dtype=torch.float32) * 10.0)
+        # Log variance clamping
+        self.max_logvar = nn.Parameter(torch.ones(1, out_features // 2) / 2.0)
+        self.min_logvar = nn.Parameter(-torch.ones(1, out_features // 2) * 10.0)
+
+        # Initialize weights
+        self._initialize_weights()
+
+    def _initialize_weights(self):
+        """Custom weight initialization."""
+        for layer in self.model:
+            if isinstance(layer, nn.Linear):
+                nn.init.truncated_normal_(layer.weight, mean=0.0, std=0.02)
+                nn.init.constant_(layer.bias, 0.0)
 
     def compute_decays(self):
-
-        lin0_decays = 0.0001 * (self.lin0_w ** 2).sum() / 2.0
-        lin1_decays = 0.00025 * (self.lin1_w ** 2).sum() / 2.0
-        lin2_decays = 0.00025 * (self.lin2_w ** 2).sum() / 2.0
-        lin3_decays = 0.0005 * (self.lin3_w ** 2).sum() / 2.0
-
-        return lin0_decays + lin1_decays + lin2_decays + lin3_decays
+        """L2 regularization on weights."""
+        decay = 0.0
+        for layer in self.model:
+            if isinstance(layer, nn.Linear):
+                decay += 0.0001 * (layer.weight ** 2).sum()
+        return decay / 2.0
 
     def fit_input_stats(self, data):
-
         mu = np.mean(data, axis=0, keepdims=True)
         sigma = np.std(data, axis=0, keepdims=True)
         sigma[sigma < 1e-12] = 1.0
@@ -57,24 +65,17 @@ class PtModel(nn.Module):
         self.inputs_sigma.data = torch.from_numpy(sigma).to(TORCH_DEVICE).float()
 
     def forward(self, inputs, ret_logvar=False):
-
-        # Transform inputs
+        # Normalize inputs
         inputs = (inputs - self.inputs_mu) / self.inputs_sigma
 
-        inputs = inputs.matmul(self.lin0_w) + self.lin0_b
-        inputs = swish(inputs)
+        # Pass through the model
+        outputs = self.model(inputs)
 
-        inputs = inputs.matmul(self.lin1_w) + self.lin1_b
-        inputs = swish(inputs)
+        # Split outputs into mean and log variance
+        mean = outputs[:, :, :self.out_features // 2]
+        logvar = outputs[:, :, self.out_features // 2:]
 
-        inputs = inputs.matmul(self.lin2_w) + self.lin2_b
-        inputs = swish(inputs)
-
-        inputs = inputs.matmul(self.lin3_w) + self.lin3_b
-
-        mean = inputs[:, :, :self.out_features // 2]
-
-        logvar = inputs[:, :, self.out_features // 2:]
+        # Clamp log variance
         logvar = self.max_logvar - F.softplus(self.max_logvar - logvar)
         logvar = self.min_logvar + F.softplus(logvar - self.min_logvar)
 
@@ -126,15 +127,7 @@ class FinRLConfigModule:
 
     @staticmethod
     def obs_cost_fn(obs):
-        #ee_pos = CartpoleConfigModule._get_ee_pos(obs)
-
-        #ee_pos -= CartpoleConfigModule.ee_sub
-
-        #ee_pos = ee_pos ** 2
-
-        #ee_pos = - ee_pos.sum(dim=1)
-
-        #return - (ee_pos / (0.6 ** 2)).exp()
+        # this cost function is wrong, cost depends on action and state
         stock_dim = self.ENV.stock_dim
         return -1*(obs[0] + sum(
                 np.array(obs[1 : (stock_dim + 1)])
