@@ -13,22 +13,19 @@ class Agent:
     """An general class for RL agents.
     """
 
-    def __init__(self, params):
+    def __init__(self, env):
         """Initializes an agent.
 
         Arguments:
             params: (DotMap) A DotMap of agent parameters.
                 .env: (OpenAI gym environment) The environment for this agent.
+                # the following are not suppoerted
                 .noisy_actions: (bool) Indicates whether random Gaussian noise will
                     be added to the actions of this agent.
                 .noise_stddev: (float) The standard deviation to be used for the
                     action noise if params.noisy_actions is True.
         """
-        assert params.get("noisy_actions", False) is False
-        self.env = params.env
-
-        if isinstance(self.env, DotMap):
-            raise ValueError("Environment must be provided to the agent at initialization.")
+        self.env = env
 
     def sample(self, horizon, policy, record_fname=None):
         """Samples a rollout from the agent.

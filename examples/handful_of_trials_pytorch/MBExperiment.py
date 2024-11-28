@@ -14,7 +14,7 @@ from DotmapUtils import get_required_argument
 
 
 class MBExperiment:
-    def __init__(self, params):
+    def __init__(self, env, params):
         """Initializes class instance.
 
         Argument:
@@ -46,9 +46,9 @@ class MBExperiment:
         # Assert True arguments that we currently do not support
         assert params.sim_cfg.get("stochastic", False) == False
 
-        self.env = get_required_argument(params.sim_cfg, "env", "Must provide environment.")
         self.task_hor = get_required_argument(params.sim_cfg, "task_hor", "Must provide task horizon.")
-        self.agent = Agent(DotMap(env=self.env, noisy_actions=False))
+        self.env = env
+        self.agent = Agent(env)
 
         self.ntrain_iters = get_required_argument(
             params.exp_cfg, "ntrain_iters", "Must provide number of training iterations."
