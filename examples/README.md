@@ -3,10 +3,6 @@ Here, we provide several home-grown examples. For more tutorials with different 
 
 For example, in the [link](https://github.com/AI4Finance-Foundation/FinRL-Tutorials/tree/master/1-Introduction/Stock_NeurIPS2018), you can find not only the notebooks, but also the csv files and a trained agent we provide.
 
-<div align="center">
-<img align="center" src=https://github.com/AI4Finance-Foundation/FinRL/blob/master/figs/FinRL_Tutorials.png>
-</div>
-
 
 ## Installing environment
 
@@ -29,6 +25,21 @@ Go to either `FinRL_A2C_StockTrading_ICAIF_2020.ipynb` or `FinRL_OptunaTuning_A2
 
 ```
 pip install optuna
+```
+
+## Installation V2
+```
+conda create -n finrl python=3.10
+conda activate finrl
+pip install -e .
+pip install optuna dm_tree tabulate
+pip install ray
+pip install --force-reinstall numpy scipy scikit-learn    
+pip install tensorflow
+
+# ray need to be reinstalled after reinstallation dm_tree!
+# see https://github.com/ray-project/ray/issues/7645#issuecomment-719865669
+# force reinstall is to solve conflicting numpy binary
 ```
 
 ## Notebook running

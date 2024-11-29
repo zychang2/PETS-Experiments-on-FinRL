@@ -1,6 +1,7 @@
 # Rllib DreamerV3 integration
 # https://github.com/ray-project/ray/blob/master/rllib/algorithms/dreamerv3/README.md
 # hyperparameters: https://arxiv.org/pdf/2301.04104v1
+# inference example: `dreamerv3_inference.py`
 from ray.rllib.algorithms.dreamerv3 import DreamerV3Config
 from pprint import pprint
 
@@ -41,15 +42,13 @@ class DRLAgent:
         self.env = env
         self.config = (
             DreamerV3Config()
-            .framework("torch")
             .environment(env=self.env, env_config=env_config)
             .training(
                 model_size="S",
                 training_ratio=4, # can tune this
             )
-            .resources(
-                num_gpus=1,
-                num_cpus_per_worker=1,
+            .env_runners(
+                num_env_runners=1,
             )
         )
         self.algorithm = self.config.build()
@@ -84,7 +83,7 @@ class DRLAgent:
             episode_total_assets.append(total_asset)
             episode_return = total_asset / env.initial_total_asset
             episode_returns.append(episode_return)
-            
+
         print("episode return: " + str(episode_return))
         print("Test Finished!")
         return episode_total_assets
