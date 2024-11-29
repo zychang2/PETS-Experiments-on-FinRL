@@ -10,14 +10,8 @@ class DRLAgent:
 
     Attributes
     ----------
-        env: gym environment class
-            user-defined class
-        price_array: numpy array
-            OHLC data
-        tech_array: numpy array
-            techical data
-        turbulence_array: numpy array
-            turbulence/risk data
+        env: gym environment class / registered env_creator name
+        env_config: dict, configuration for setting up the environment
     Methods
     -------
         get_model()
