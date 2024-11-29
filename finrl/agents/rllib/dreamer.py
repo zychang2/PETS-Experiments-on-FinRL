@@ -2,6 +2,7 @@
 # https://github.com/ray-project/ray/blob/master/rllib/algorithms/dreamerv3/README.md
 # hyperparameters: https://arxiv.org/pdf/2301.04104v1
 # inference example: `dreamerv3_inference.py`
+# https://docs.ray.io/en/latest/rllib/rllib-rlmodule.html#rlmodule-guide
 from ray.rllib.algorithms.dreamerv3 import DreamerV3Config
 from pprint import pprint
 
@@ -36,6 +37,10 @@ class DRLAgent:
         self.env = env
         self.config = (
             DreamerV3Config()
+            # .api_stack( # Dreamer v3 is not compatible with old API stack
+            #     enable_rl_module_and_learner=True,
+            #     enable_env_runner_and_connector_v2=True,
+            # )
             .environment(env=self.env, env_config=env_config)
             .training(
                 model_size="S",
@@ -44,6 +49,10 @@ class DRLAgent:
             .env_runners(
                 num_env_runners=1,
             )
+            # .learners(
+            #     num_learners=0,
+            #     num_gpus_per_learner=1,
+            # )
         )
         self.algorithm = self.config.build()
 

@@ -36,6 +36,9 @@ pip install optuna dm_tree tabulate
 pip install ray
 pip install --force-reinstall numpy scipy scikit-learn    
 pip install tensorflow
+pip install "tensorflow-probability[tf]"
+
+# I have run pip freeze > requirements2.txt after all
 
 # ray need to be reinstalled after reinstallation dm_tree!
 # see https://github.com/ray-project/ray/issues/7645#issuecomment-719865669

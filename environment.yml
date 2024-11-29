@@ -1,0 +1,11 @@
+name: finrl
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - ipykernel
+  - python=3.10
+  - pytorch::pytorch
+  - torchaudio
+  - torchvision
+prefix: /Users/maxwill/miniconda3/envs/finrl
