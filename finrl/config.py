@@ -57,6 +57,8 @@ ERL_PARAMS = {
     "eval_gap": 30,
     "eval_times": 64,  # bug fix:KeyError: 'eval_times' line 68, in get_model model.eval_times = model_kwargs["eval_times"]
 }
+HER_PARAMS = {'buffer_size': 10000, 'learning_rate': 1.120018965138855e-05, 'batch_size': 128}
+BUFFER_PARAMS = {"n_sampled_goal": 4, "goal_selection_strategy": "future"}
 RLlib_PARAMS = {"lr": 5e-5, "train_batch_size": 500, "gamma": 0.99}
 
 
