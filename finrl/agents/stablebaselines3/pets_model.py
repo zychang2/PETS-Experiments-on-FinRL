@@ -151,7 +151,7 @@ class PETSAgent:
                 return 0.0
         else:
             return (
-                (4**0.5)
+                (252**0.5)
                 * df_total_value["daily_return"].mean()
                 / df_total_value["daily_return"].std()
             )

@@ -11,6 +11,9 @@ To set up the environment on my local machine I used conda. I'm using windows 10
 ```
 conda create -n finrlenv python=3.10
 pip install -e .  // At the root folder (/FinRL)
+// to run a notebook on pace-ice
+conda install ipykernel
+python -m ipykernel install --user --name=finrl
 ```
 
 **Note:** There seems to be a problem if using python 3.12 (examples: [link](https://github.com/pygeos/pygeos/issues/463)). My original environment was 3.10 and it worked fine. I have double checked it works with the new environment.
