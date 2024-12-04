@@ -19,7 +19,7 @@ from finrl import config
 from finrl.meta.env_stock_trading.env_stocktrading import StockTradingEnv
 from finrl.meta.preprocessor.preprocessors import data_split
 
-MODELS = {"a2c": A2C, "ddpg": DDPG, "td3": TD3, "sac": SAC, "ppo": PPO}
+MODELS = {"A2C": A2C, "DDPG": DDPG, "TD3": TD3, "SAC": SAC, "PPO": PPO}
 
 MODEL_KWARGS = {x: config.__dict__[f"{x.upper()}_PARAMS"] for x in MODELS.keys()}
 
@@ -447,22 +447,22 @@ class DRLSingleAgent:
                 initial=initial,
             ) 
 
-            end = time.time()
-            print("Strategy took: ", (end - start) / 60, " minutes")
+        end = time.time()
+        print("Strategy took: ", (end - start) / 60, " minutes")
 
-            df_summary = pd.DataFrame(
-                [
-                    iteration_list,
-                    validation_start_date_list,
-                    validation_end_date_list,
-                    sharpe_list
-                ]
-            ).T
-            df_summary.columns = [
-                "Iter",
-                "Val Start",
-                "Val End",
-                f"{self.model_name} Sharpe"
+        df_summary = pd.DataFrame(
+            [
+                iteration_list,
+                validation_start_date_list,
+                validation_end_date_list,
+                sharpe_list
             ]
+        ).T
+        df_summary.columns = [
+            "Iter",
+            "Val Start",
+            "Val End",
+            f"{self.model_name} Sharpe"
+        ]
 
-            return df_summary # Returns sharpe and valuation information
+        return df_summary # Returns sharpe and valuation information
