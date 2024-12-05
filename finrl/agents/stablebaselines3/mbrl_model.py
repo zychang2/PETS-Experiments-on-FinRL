@@ -9,7 +9,8 @@ from stable_baselines3.common.noise import NormalActionNoise
 from stable_baselines3.common.noise import OrnsteinUhlenbeckActionNoise
 from stable_baselines3.common.vec_env import DummyVecEnv
 
-from finrl import config
+# from finrl import config
+from pathlib import Path
 from finrl.meta.env_stock_trading.env_stocktrading import StockTradingEnv
 from finrl.meta.preprocessor.preprocessors import data_split
 
@@ -73,7 +74,7 @@ class MBRLAgent:
         return data
 
     @staticmethod
-    def train_dynamics_model(data, model, optimizer, criterion, iter_num, num_epochs, batch_size=32):
+    def train_dynamics_model(checkpoint_dir, model_name, data, model, optimizer, criterion, iter_num, num_epochs, batch_size=32):
         states, actions, rewards, next_states = zip(*data)
         states = torch.tensor(states, dtype=torch.float32)
         actions = torch.tensor(actions, dtype=torch.float32)
@@ -94,7 +95,7 @@ class MBRLAgent:
                 optimizer.step()
         torch.save(
             model.state_dict(),
-            f"{config.TRAINED_MODEL_DIR}/MBRL_{iter_num}" # Saves to a model to a file so that it can be called during execution
+            Path(checkpoint_dir) / f"{model_name}_{iter_num}" # Saves to a model to a file so that it can be called during execution
         )
         return model
 
@@ -119,9 +120,9 @@ class MBRLAgent:
         return best_action
 
     @staticmethod
-    def get_validation_sharpe(iteration): # This function is only needed for ensembling, ignore during model development portion
+    def get_validation_sharpe(model_name, iteration): # This function is only needed for ensembling, ignore during model development portion
         df_total_value = pd.read_csv(
-            f"results/account_value_validation_MBRL_{iteration}.csv"
+            f"results/account_value_validation_{model_name}_{iteration}.csv"
         )
         if df_total_value["daily_return"].var() == 0:
             if df_total_value["daily_return"].mean() > 0:
@@ -137,6 +138,8 @@ class MBRLAgent:
     
     def __init__(
         self,
+        checkpoint_dir,
+        model_name,
         df, 
         train_period,
         val_test_period,
@@ -152,11 +155,13 @@ class MBRLAgent:
         action_space,
         tech_indicator_list,
         print_verbosity,
-        hidden_dim=64,
-        lr = 1e-4,
-        epochs=100,
-        horizon=10
+        hidden_dim,
+        lr,
+        epochs,
+        horizon,
     ):
+        self.checkpoint_dir = checkpoint_dir
+        self.model_name = model_name
         self.df = df # Stock data
         self.train_period = train_period # tuple containing training start_date and end_date, starts 2010-2021
         self.val_test_period = val_test_period # tuple: 2021-2023
@@ -218,7 +223,7 @@ class MBRLAgent:
                     turbulence_threshold=turbulence_threshold,
                     initial=initial,
                     previous_state=last_state,
-                    model_name="MBRL",
+                    model_name=self.model_name,
                     mode="trade",
                     iteration=iter_num,
                     print_verbosity=self.print_verbosity,
@@ -237,7 +242,7 @@ class MBRLAgent:
                 last_state = trade_env.envs[0].render() # Saves state from first environment in DummyVecEnv wrapper on that day, can use render() in ours
 
         df_last_state = pd.DataFrame({"last_state": last_state})
-        df_last_state.to_csv(f"results/last_state_MBRL_{i}.csv", index=False)
+        df_last_state.to_csv(f"results/last_state_{self.model_name}_{i}.csv", index=False)
         return last_state
 
     def _train_window(
@@ -250,9 +255,11 @@ class MBRLAgent:
         validation,
         turbulence_threshold,
     ):
-        print(f"======MBRL Training========")
+        print(f"====={self.model_name} Training========")
         train_data = self.collect_data(self.train_env)
         model = self.train_dynamics_model(
+            self.checkpoint_dir,
+            self.model_name,
             train_data,
             self.dynamics_model,
             self.optimizer,
@@ -261,7 +268,7 @@ class MBRLAgent:
             self.num_epochs
         )  
         print(
-            f"======MBRL Validation from: ",
+            f"======{self.model_name}Validation from: ",
             validation_start_date,
             "to ",
             validation_end_date,
@@ -282,7 +289,7 @@ class MBRLAgent:
                     tech_indicator_list=self.tech_indicator_list,
                     turbulence_threshold=turbulence_threshold,
                     iteration=i, # This is import for model retrieval - includes iteration in file path
-                    model_name='MBRL', # This is also important for model retrieval - includes this string in file path
+                    model_name=self.model_name, # This is also important for model retrieval - includes this string in file path
                     mode="validation",
                     print_verbosity=self.print_verbosity,
                 )
@@ -295,8 +302,8 @@ class MBRLAgent:
             test_env=val_env,
             test_obs=val_obs,
         )
-        sharpe = self.get_validation_sharpe(i) # Gets sharpe ratio from validation iteration - only needed for ensembling so leave alone
-        print(f"MBRL Sharpe Ratio: ", sharpe)
+        sharpe = self.get_validation_sharpe(self.model_name, i) # Gets sharpe ratio from validation iteration - only needed for ensembling so leave alone
+        print(f"{self.model_name} Sharpe Ratio: ", sharpe)
         sharpe_list.append(sharpe)
         return model, sharpe_list, sharpe # Returns model and sharpe values, used for model selection in ensembling - leave alone
 
@@ -306,8 +313,8 @@ class MBRLAgent:
     ):
         sharpe_list = []
         sharpe = -1
-        """Strategy for MBRL"""
-        print("============Start MBRL Strategy============")
+        f"""Strategy for {self.model_name}"""
+        print(f"============Start {self.model_name} Strategy============")
         # For ensemble model, it's necessary to feed the last state of the previous model to the current model as the initial state
         last_state_ensemble = []
         validation_start_date_list = []
@@ -455,7 +462,7 @@ class MBRLAgent:
             "Iter",
             "Val Start",
             "Val End",
-            "MBRL Sharpe"
+            f"{self.model_name} Sharpe"
         ]
 
         return df_summary
