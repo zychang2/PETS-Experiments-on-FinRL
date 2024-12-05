@@ -46,6 +46,7 @@ Our modifications can be break down into two major types: agents implementation 
 * In `mbrl_model.py`, we implemented a vanilla model-based RL agent, where we rollout actions completely at random.
 * In `pets_model.py`, we implemented a PETS agent.
 * In `single_models.py`, we refractor the code in `models.py` so single agents can easily be called in our experiments notebooks.
+* In `modified_pets_model.py`, we have a slightly different version of PETS. For this one, we consider the mean reward of the elite actions instead of argmax.
 
 ### Experiment notebooks
 * All of our experiments are in jupyter notebook format and they are in the `examples/` folder. Because the notebooks in the original repo are also in this folder, we will only list the notebooks created by us below.
@@ -54,3 +55,5 @@ Our modifications can be break down into two major types: agents implementation 
 * `FinRL_PETS_StockTrading.ipynb` and `FinRL_PETS_StockTrading_pace.ipynb`: Notebooks to validate the PETS implementation.
 * `FinRL_MBRL_StockTrading.ipynb`: Notebook to validate the MBRL implementation.
 * `FinRL_Final_Project.ipynb`: TODO
+* `FinRL_Final_Project2.ipynb`: TODO
+* `FinRL_Final_Project_Ablation.ipynb`: TODO
