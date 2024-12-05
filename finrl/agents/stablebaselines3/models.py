@@ -418,7 +418,7 @@ class DRLEnsembleAgent:
         sharpe_list.append(sharpe)
         return model, sharpe_list, sharpe
 
-    def run_ensemble_strategy(
+    def run_strategy(
         self,
         A2C_model_kwargs,
         PPO_model_kwargs,

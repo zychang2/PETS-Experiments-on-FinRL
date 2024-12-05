@@ -283,7 +283,7 @@ class DRLSingleAgent:
         sharpe_list.append(sharpe)
         return model, sharpe_list, sharpe
 
-    def run_single_model_strategy(
+    def run_strategy(
         self,
         model_kwargs,
         timesteps,

@@ -259,7 +259,7 @@ class DRLHERAgent:
         return model, sharpe_list, sharpe # Returns model and sharpe values, used for model selection in ensembling - leave alone
     
 
-    def run_HER_strategy(
+    def run_strategy(
         self,
         model_kwargs,
         timesteps,

@@ -332,7 +332,7 @@ class PETSAgent:
         return models, sharpe_list, sharpe
 
 
-    def run_PETS_strategy(
+    def run_strategy(
         self,
         timesteps,
     ):
