@@ -40,20 +40,37 @@ To setup Georgia Tech PACE environment on a local VSCode, follow this [guide](ss
 Our modifications can be break down into two major types: agents implementation and experiment notebooks.
 
 ### Agent implementation
+
 * We build agents upon the code in `finrl/agents/stablebaselines3/models.py`, all of the agents implemented by us is under this folder.
+
 * In `a2c_model.py`, we separate the A2C agent out of the ensembel agents in `models.py`.
+
 * In `her_1.py` and `her.py`, we introduced `HerReplayBuffer` from `stablebaselines3` on top of their `DDPG` agent.
+
 * In `mbrl_model.py`, we implemented a vanilla model-based RL agent, where we rollout actions completely at random.
+
 * In `pets_model.py`, we implemented a PETS agent.
+
 * In `single_models.py`, we refractor the code in `models.py` so single agents can easily be called in our experiments notebooks.
+
 * In `modified_pets_model.py`, we have a slightly different version of PETS. For this one, we consider the mean reward of the elite actions instead of argmax.
 
+* In `pets_no_ensemble_model.py`, we implement a version of `pets_model.py`, where the number for dynamics model is 1.
+
 ### Experiment notebooks
+
 * All of our experiments are in jupyter notebook format and they are in the `examples/` folder. Because the notebooks in the original repo are also in this folder, we will only list the notebooks created by us below.
-* `DRL_A2C_StockTrading_ICAIF_2020.ipynb`: this is a notebook created to run with single A2C agent from `a2c_model.py`. This serves the purpose to familiarize us with the framework.
+
+* `DRL_A2C.ipynb`: this is a notebook created to run with single A2C agent from `a2c_model.py`, with and without optimized hyperparameters. This serves the purpose to familiarize us with the framework.
+
 * `FinRL_OptunaTuning_A2C.ipynb`: In this notebook, we perform hyperparameter tuning on a A2C agent, using `optuna` library.
+
 * `FinRL_PETS_StockTrading.ipynb` and `FinRL_PETS_StockTrading_pace.ipynb`: Notebooks to validate the PETS implementation.
+
 * `FinRL_MBRL_StockTrading.ipynb`: Notebook to validate the MBRL implementation.
-* `FinRL_Final_Project.ipynb`: TODO
-* `FinRL_Final_Project2.ipynb`: TODO
-* `FinRL_Final_Project_Ablation.ipynb`: TODO
+
+* `FinRL_Final_Project.ipynb`: Notebook where we conduct experiments on all models separately.
+
+* `FinRL_Final_Project_DA.ipynb`: Notebook to calculate and analyze sharpe ratios. To run this notebook, unzip the data folders in `original_results.zip` and `pets_only_results.zip` to the `examples/` folder.
+
+* `FinRL_Final_Project_Ablation.ipynb`: Notebook where we conduct ablation experiments on our implementation of PETS agents.

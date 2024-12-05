@@ -147,3 +147,8 @@ papertrading_test.py
 alpaca_processor_test.py
 /finrl/config_private.py
 .history/
+
+!original_results.zip
+!pets_only_results.zip
+examples/FinRL_OptunaTuning_HER.ipynb
+examples/final_her_study__.pkl
