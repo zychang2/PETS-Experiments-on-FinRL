@@ -71,6 +71,6 @@ Our modifications can be break down into two major types: agents implementation 
 
 * `FinRL_Final_Project.ipynb`: Notebook where we conduct experiments on all models separately.
 
-* `FinRL_Final_Project_DA.ipynb`: Notebook to calculate and analyze sharpe ratios. To run this notebook, unzip the data folders in `original_results.zip` and `pets_only_results.zip` to the `examples/` folder.
+* `FinRL_Final_Project_DA.ipynb`: Notebook to calculate and analyze sharpe ratios. To run this notebook, unzip the data folders in `original_results.zip`, `pets_only_results.zip`, `new_pets_results.zip` to the `examples/` folder.
 
 * `FinRL_Final_Project_Ablation.ipynb`: Notebook where we conduct ablation experiments on our implementation of PETS agents.
