@@ -45,7 +45,7 @@ Our modifications can be break down into two major types: agents implementation 
 
 * In `a2c_model.py`, we separate the A2C agent out of the ensembel agents in `models.py`.
 
-* In `her_1.py` and `her.py`, we introduced `HerReplayBuffer` from `stablebaselines3` on top of their `DDPG` agent.
+<!-- * In `her_1.py` and `her.py`, we introduced `HerReplayBuffer` from `stablebaselines3` on top of their `DDPG` agent. -->
 
 * In `mbrl_model.py`, we implemented a vanilla model-based RL agent, where we rollout actions completely at random.
 
@@ -73,4 +73,8 @@ Our modifications can be break down into two major types: agents implementation 
 
 * `FinRL_Final_Project_DA.ipynb`: Notebook to calculate and analyze sharpe ratios. To run this notebook, unzip the data folders in `original_results.zip`, `pets_only_results.zip`, `new_pets_results.zip` to the `examples/` folder.
 
-* `FinRL_Final_Project_Ablation.ipynb`: Notebook where we conduct ablation experiments on our implementation of PETS agents.
+### Ablation study notebooks
+
+* For the ablation studies, navigate to the [`ablation`](https://github.com/zychang2/PETS-Experiments-on-FinRL/tree/ablation) branch of the repository.
+
+* `DRL_Final_Project_Ablation_longer_sampling_pace_new_PETS.ipynb`: this notebook conducts the ablation experiment, which test the performance between PETS with its ensemble dynamics models, and a variation of PETS, where there is a single dynamics model.
